@@ -26,6 +26,9 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.net.URLDecoder
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import com.google.gson.Gson
 
 data class Reservation(
     val datetime: String,
@@ -52,10 +55,10 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
+    override fun onNewIntent(intent: Intent) {
+        intent.let { super.onNewIntent(it) }
         // 新しいインテントから共有されたデータを取得
-        sharedText = intent?.getStringExtra(Intent.EXTRA_TEXT)
+        sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
         // UIを更新
         setContent {
             KokuboTaxiTheme {
@@ -67,10 +70,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(sharedText: String?) {
+    val context = LocalContext.current
     val tabs = listOf("ホーム", "予約一覧")
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
-    var selectedReservation by remember { mutableStateOf<Reservation?>(null) }
+    // 初期値として保存された予約を読み込み
+    var selectedReservation by remember { mutableStateOf<Reservation?>(loadSelectedReservation(context)) }
+
+    // 状態が変化するたびに保存
+    LaunchedEffect(selectedReservation) {
+        saveSelectedReservation(context, selectedReservation)
+    }
 
     Scaffold(
         modifier = Modifier
@@ -290,3 +300,21 @@ fun TimePickerDialog(
     )
 }
 
+// 以下のヘルパー関数を追加
+fun loadSelectedReservation(context: Context): Reservation? {
+    val prefs = context.getSharedPreferences("reservation_prefs", Context.MODE_PRIVATE)
+    val json = prefs.getString("selected_reservation", null)
+    return if (json != null) Gson().fromJson(json, Reservation::class.java) else null
+}
+
+fun saveSelectedReservation(context: Context, reservation: Reservation?) {
+    val prefs = context.getSharedPreferences("reservation_prefs", Context.MODE_PRIVATE)
+    val editor = prefs.edit()
+    if (reservation != null) {
+        val json = Gson().toJson(reservation)
+        editor.putString("selected_reservation", json)
+    } else {
+        editor.remove("selected_reservation")
+    }
+    editor.apply()
+}
