@@ -128,7 +128,7 @@ fun ReservationListScreen(
         }
     ) { innerPadding ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 500.dp), // 最小幅200dpで列を自動調整
+            columns = GridCells.Adaptive(minSize = 350.dp), // 最小幅200dpで列を自動調整
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
