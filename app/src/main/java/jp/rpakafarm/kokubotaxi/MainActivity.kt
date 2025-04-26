@@ -176,19 +176,23 @@ fun HomeScreen(sharedText: String?, selectedReservation: Reservation?) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             selectedReservation?.let {
-                Card(
-                    modifier = Modifier
-                        .widthIn(0.dp, 500.dp)
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFE4B5))
+                Column(
+                    modifier = Modifier.widthIn(0.dp, 500.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = it.datetime)
-                        Text(text = it.customerName)
-                        Text(text = it.pickupAddress)
-                        Text(text = it.phoneNumber)
-                        Text(text = it.destination)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFE4B5))
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(text = it.datetime)
+                            Text(text = it.customerName)
+                            Text(text = it.pickupAddress)
+                            Text(text = it.phoneNumber)
+                            Text(text = it.destination)
+                        }
                     }
                 }
             } ?: Text(text = "")
