@@ -28,6 +28,7 @@ import okhttp3.Request
 import java.net.URLDecoder
 import android.content.Context
 import androidx.compose.foundation.Canvas
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -84,6 +85,8 @@ fun MainScreen(sharedText: String?) {
     val tabs = listOf("ホーム", "予約一覧")
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
+
+    var showReservationText by rememberSaveable { mutableStateOf(true) }
     // 初期値として保存された予約を読み込み
     var selectedReservation by remember { mutableStateOf<Reservation?>(loadSelectedReservation(context)) }
 
@@ -132,7 +135,7 @@ fun MainScreen(sharedText: String?) {
                 .padding(innerPadding)
         ) { page ->
             when (page) {
-                0 -> HomeScreen(sharedText, selectedReservation)
+                0 -> HomeScreen(sharedText, selectedReservation, showReservationText, onShowReservationTextChange = { showReservationText = it })
                 1 -> ReservationListScreen(
                     selectedReservation = selectedReservation,
                     onReservationSelected = { selectedReservation = it }
@@ -143,10 +146,14 @@ fun MainScreen(sharedText: String?) {
 }
 
 @Composable
-fun HomeScreen(sharedText: String?, selectedReservation: Reservation?) {
+fun HomeScreen(
+    sharedText: String?,
+    selectedReservation: Reservation?,
+    showReservationText: Boolean,
+    onShowReservationTextChange: (Boolean) -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
     var displayText by remember { mutableStateOf("読み込み中...") }
-    var showReservationText by remember { mutableStateOf(true) }
 
     LaunchedEffect(sharedText) {
         if (sharedText != null) {
@@ -238,11 +245,11 @@ fun HomeScreen(sharedText: String?, selectedReservation: Reservation?) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                Button(onClick = { showReservationText = false }) {
+                Button(onClick = { onShowReservationTextChange(false) }) {
                     Text("切", fontSize = 30.sp)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = { showReservationText = true }) {
+                Button(onClick = { onShowReservationTextChange(true) }) {
                     Text("入", fontSize = 30.sp)
                 }
             }
