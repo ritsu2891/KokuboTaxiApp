@@ -86,7 +86,7 @@ fun MainScreen(sharedText: String?) {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
-    var showReservationText by rememberSaveable { mutableStateOf(true) }
+    var showReservationText by rememberSaveable { mutableStateOf(false) }
     // 初期値として保存された予約を読み込み
     var selectedReservation by remember { mutableStateOf<Reservation?>(loadSelectedReservation(context)) }
 
