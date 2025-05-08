@@ -1,8 +1,9 @@
 package jp.rpakafarm.kokubotaxi.data
 
-import com.google.gson.Gson
 import android.content.Context
 import androidx.core.content.edit
+import com.google.gson.Gson
+import java.time.LocalDateTime
 
 /**
  * 乗務員個人予約
@@ -14,7 +15,7 @@ data class Reservation (
      * 予約日時
      * @since 0.1.0
      */
-    val datetime: String,
+    val datetime: LocalDateTime,
     /**
      * 予約者名
      * @since 0.1.0

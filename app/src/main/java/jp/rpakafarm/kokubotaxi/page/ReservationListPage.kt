@@ -42,35 +42,35 @@ fun ReservationListPage(
         mutableStateOf(
             listOf(
                 Reservation(
-                    datetime = "2023-10-01 10:00",
+                    datetime = LocalDateTime.of(2023, 10, 1, 10, 0),
                     customerName = "山田 太郎",
                     pickupAddress = "東京都新宿区1-1-1",
                     phoneNumber = "090-1234-5678",
                     destination = "東京駅"
                 ),
                 Reservation(
-                    datetime = "2023-10-02 14:30",
+                    datetime = LocalDateTime.of(2023, 10, 2, 15, 30),
                     customerName = "佐藤 花子",
                     pickupAddress = "東京都渋谷区2-2-2",
                     phoneNumber = "080-9876-5432",
                     destination = "羽田空港"
                 ),
                 Reservation(
-                    datetime = "2023-10-03 09:00",
+                    datetime = LocalDateTime.of(2023, 10, 3, 12, 0),
                     customerName = "鈴木 一郎",
                     pickupAddress = "東京都港区3-3-3",
                     phoneNumber = "070-1111-2222",
                     destination = "六本木ヒルズ"
                 ),
                 Reservation(
-                    datetime = "2023-10-04 16:45",
+                    datetime = LocalDateTime.of(2023, 10, 4, 18, 45),
                     customerName = "高橋 美咲",
                     pickupAddress = "東京都品川区4-4-4",
                     phoneNumber = "090-3333-4444",
                     destination = "品川駅"
                 ),
                 Reservation(
-                    datetime = "2023-10-05 12:15",
+                    datetime = LocalDateTime.of(2023, 10, 5, 9, 15),
                     customerName = "田中 健",
                     pickupAddress = "東京都世田谷区5-5-5",
                     phoneNumber = "080-5555-6666",
@@ -204,7 +204,7 @@ fun ReservationListPage(
                     Button(
                         onClick = {
                             reservations = reservations + Reservation(
-                                datetime = datetime,
+                                datetime = LocalDateTime.now(),
                                 customerName = customerName,
                                 pickupAddress = pickupAddress,
                                 phoneNumber = phoneNumber,
