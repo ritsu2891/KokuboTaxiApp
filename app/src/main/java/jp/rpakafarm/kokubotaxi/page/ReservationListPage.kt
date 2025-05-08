@@ -1,10 +1,9 @@
-package jp.rpakafarm.kokubotaxi
+package jp.rpakafarm.kokubotaxi.page
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,44 +11,30 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import jp.rpakafarm.kokubotaxi.data.Reservation
+import jp.rpakafarm.kokubotaxi.ui.ReservationCard
+import jp.rpakafarm.kokubotaxi.ui.dialog.TimePickerDialog
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import kotlin.collections.plus
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.graphics.Color
 
+/**
+ * 予約一覧ページ
+ * @param selectedReservation 選択された予約
+ * @param onReservationSelected 予約が選択されたときのコールバック
+ * @since 0.1.0
+ * @author ChatGPT 4o, Ritsuki KOKUBO
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ReservationListScreen(
+fun ReservationListPage(
     selectedReservation: Reservation?,
     onReservationSelected: (Reservation?) -> Unit
 ) {
@@ -103,11 +88,9 @@ fun ReservationListScreen(
     var phoneNumber by remember { mutableStateOf("") }
     var destination by remember { mutableStateOf("") }
 
-    // Material3 DatePicker/TimePicker states
     val openDatePicker = remember { mutableStateOf(false) }
     val openTimePicker = remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-    val timePickerState = rememberTimePickerState()
 
     val focusRequester1 = FocusRequester()
     val focusRequester2 = FocusRequester()
@@ -119,7 +102,6 @@ fun ReservationListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onReservationSelected(null)
                     showDialog = true
                 }
             ) {
@@ -128,33 +110,21 @@ fun ReservationListScreen(
         }
     ) { innerPadding ->
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 350.dp), // 最小幅200dpで列を自動調整
+            columns = GridCells.Adaptive(minSize = 350.dp),
             modifier = Modifier
                 .padding(innerPadding)
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
             items(reservations) { reservation ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            val newSelection = if (selectedReservation == reservation) null else reservation
-                            onReservationSelected(newSelection)
-                        },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedReservation == reservation) Color(0xFFFFE4B5) else Color.White
-                    )
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = reservation.datetime)
-                        Text(text = reservation.customerName)
-                        Text(text = reservation.pickupAddress)
-                        Text(text = reservation.phoneNumber)
-                        Text(text = reservation.destination)
+                ReservationCard(
+                    reservation = reservation,
+                    isSelected = selectedReservation == reservation,
+                    onClick = {
+                        val newSelection = if (selectedReservation == reservation) null else reservation
+                        onReservationSelected(newSelection)
                     }
-                }
+                )
             }
         }
 
@@ -291,7 +261,7 @@ fun ReservationListScreen(
                     val pickedDateTime = LocalDateTime.ofEpochSecond(
                         (datePickerState.selectedDateMillis ?: System.currentTimeMillis()) / 1000,
                         0,
-                        java.time.ZoneOffset.UTC
+                        ZoneOffset.UTC
                     ).withHour(hour).withMinute(minute)
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                     datetime = pickedDateTime.format(formatter)
