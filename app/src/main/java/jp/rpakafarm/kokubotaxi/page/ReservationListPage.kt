@@ -30,56 +30,15 @@ import java.time.format.DateTimeFormatter
  * @param selectedReservation 選択された予約
  * @param onReservationSelected 予約が選択されたときのコールバック
  * @since 0.1.0
- * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReservationListPage(
+    reservations: List<Reservation>,
+    onReservationsChange: (List<Reservation>) -> Unit,
     selectedReservation: Reservation?,
     onReservationSelected: (Reservation?) -> Unit
 ) {
-    var reservations by remember {
-        mutableStateOf(
-            listOf(
-                Reservation(
-                    datetime = LocalDateTime.of(2023, 10, 1, 10, 0),
-                    customerName = "山田 太郎",
-                    pickupAddress = "東京都新宿区1-1-1",
-                    phoneNumber = "090-1234-5678",
-                    destination = "東京駅"
-                ),
-                Reservation(
-                    datetime = LocalDateTime.of(2023, 10, 2, 15, 30),
-                    customerName = "佐藤 花子",
-                    pickupAddress = "東京都渋谷区2-2-2",
-                    phoneNumber = "080-9876-5432",
-                    destination = "羽田空港"
-                ),
-                Reservation(
-                    datetime = LocalDateTime.of(2023, 10, 3, 12, 0),
-                    customerName = "鈴木 一郎",
-                    pickupAddress = "東京都港区3-3-3",
-                    phoneNumber = "070-1111-2222",
-                    destination = "六本木ヒルズ"
-                ),
-                Reservation(
-                    datetime = LocalDateTime.of(2023, 10, 4, 18, 45),
-                    customerName = "高橋 美咲",
-                    pickupAddress = "東京都品川区4-4-4",
-                    phoneNumber = "090-3333-4444",
-                    destination = "品川駅"
-                ),
-                Reservation(
-                    datetime = LocalDateTime.of(2023, 10, 5, 9, 15),
-                    customerName = "田中 健",
-                    pickupAddress = "東京都世田谷区5-5-5",
-                    phoneNumber = "080-5555-6666",
-                    destination = "渋谷駅"
-                )
-            )
-        )
-    }
-
     var showDialog by remember { mutableStateOf(false) }
 
     var datetime by remember { mutableStateOf("") }
@@ -91,6 +50,7 @@ fun ReservationListPage(
     val openDatePicker = remember { mutableStateOf(false) }
     val openTimePicker = remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    var selectedDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
 
     val focusRequester1 = FocusRequester()
     val focusRequester2 = FocusRequester()
@@ -203,19 +163,21 @@ fun ReservationListPage(
                 confirmButton = {
                     Button(
                         onClick = {
-                            reservations = reservations + Reservation(
-                                datetime = LocalDateTime.now(),
+                            val newReservation = Reservation(
+                                datetime = selectedDateTime ?: LocalDateTime.now(),
                                 customerName = customerName,
                                 pickupAddress = pickupAddress,
                                 phoneNumber = phoneNumber,
                                 destination = destination
                             )
+                            onReservationsChange(reservations + newReservation)
                             // リセット
                             datetime = ""
                             customerName = ""
                             pickupAddress = ""
                             phoneNumber = ""
                             destination = ""
+                            selectedDateTime = null
                             showDialog = false
                         }
                     ) {
@@ -263,6 +225,7 @@ fun ReservationListPage(
                         0,
                         ZoneOffset.UTC
                     ).withHour(hour).withMinute(minute)
+                    selectedDateTime = pickedDateTime
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
                     datetime = pickedDateTime.format(formatter)
                 }

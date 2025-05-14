@@ -30,11 +30,12 @@ import jp.rpakafarm.kokubotaxi.page.ReservationListPage
 import jp.rpakafarm.kokubotaxi.data.loadSelectedReservation
 import jp.rpakafarm.kokubotaxi.data.saveSelectedReservation
 import jp.rpakafarm.kokubotaxi.page.HomePage
+import jp.rpakafarm.kokubotaxi.data.loadReservations
+import jp.rpakafarm.kokubotaxi.data.saveReservations
 
 /**
  * メイン画面
  * @since 0.1.0
- * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @Composable
 fun MainScreen() {
@@ -44,10 +45,14 @@ fun MainScreen() {
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var showReservationText by rememberSaveable { mutableStateOf(false) }
     var selectedReservation by remember { mutableStateOf(loadSelectedReservation(context)) }
+    var reservations by remember { mutableStateOf(loadReservations(context)) }
 
     // 状態が変化するたびに保存
     LaunchedEffect(selectedReservation) {
         saveSelectedReservation(context, selectedReservation)
+    }
+    LaunchedEffect(reservations) {
+        saveReservations(context, reservations)
     }
 
     Scaffold(
@@ -96,6 +101,8 @@ fun MainScreen() {
                     onShowReservationTextChange = { showReservationText = it }
                 )
                 1 -> ReservationListPage(
+                    reservations = reservations,
+                    onReservationsChange = { reservations = it },
                     selectedReservation = selectedReservation,
                     onReservationSelected = { selectedReservation = it }
                 )
