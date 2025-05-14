@@ -29,7 +29,8 @@ import androidx.compose.ui.unit.sp
 fun ReservationCard(
     reservation: Reservation,
     isSelected: Boolean = false,
-    onClick: (Reservation) -> Unit
+    onClick: (Reservation) -> Unit,
+    showCheckbox: Boolean = false
 ) {
     Card(
         modifier = Modifier
@@ -72,6 +73,15 @@ fun ReservationCard(
                 Text(text = reservation.pickupAddress)
                 Text(text = reservation.destination)
             }
+            if (showCheckbox) {
+                Checkbox(
+                    checked = true,
+                    onCheckedChange = null, // チェックボックス自体はクリック不可
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                )
+            }
             if (isSelected) {
                 Icon(
                     imageVector = Icons.Filled.PushPin,
@@ -99,6 +109,8 @@ fun PreviewReservationCard() {
             destination = "東京都渋谷区渋谷1-1-1"
         ),
         isSelected = true, // プレビューでピン留めアイコンを表示
-        onClick = {}
+        onClick = {},
+        showCheckbox = true // プレビューでチェックボックスを表示
     )
 }
+

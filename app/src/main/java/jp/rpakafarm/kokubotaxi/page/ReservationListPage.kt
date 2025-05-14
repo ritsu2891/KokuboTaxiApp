@@ -11,6 +11,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -36,10 +39,12 @@ import java.time.format.DateTimeFormatter
 fun ReservationListPage(
     reservations: List<Reservation>,
     onReservationsChange: (List<Reservation>) -> Unit,
-    selectedReservation: Reservation?,
-    onReservationSelected: (Reservation?) -> Unit
+    pinnedReservation: Reservation?,
+    onReservationPinned: (Reservation?) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
+    var isEditMode by remember { mutableStateOf(false) }
+    val selectedReservations = remember { mutableStateListOf<Reservation>() }
 
     var datetime by remember { mutableStateOf("") }
     var customerName by remember { mutableStateOf("") }
@@ -59,15 +64,47 @@ fun ReservationListPage(
     val focusRequester5 = FocusRequester()
 
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    showDialog = true
+        bottomBar = {
+            BottomAppBar(
+                actions = {
+                    IconButton(onClick = {
+                        isEditMode = !isEditMode;
+                        selectedReservations.clear();
+                    }) {
+                        Icon(
+                            if (isEditMode) Icons.Filled.Done else Icons.Filled.Edit,
+                            contentDescription = if (isEditMode) "編集モード終了" else "編集モード開始"
+                        )
+                    }
+                    if (isEditMode) {
+                        IconButton(
+                            onClick = {
+                                // 削除指定された予約の中にピン留め中の予約があれば解除する
+                                if (pinnedReservation in selectedReservations) {
+                                    onReservationPinned(null)
+                                }
+                                // 選択された予約を削除
+                                onReservationsChange(reservations - selectedReservations)
+                                selectedReservations.clear()
+                                isEditMode = false
+                            },
+                            enabled = selectedReservations.isNotEmpty()
+                        ) {
+                            Icon(Icons.Default.Delete, contentDescription = "削除実行")
+                        }
+                    }
+                },
+                floatingActionButton = {
+                    if (!isEditMode) {
+                        FloatingActionButton(
+                            onClick = { showDialog = true }
+                        ) {
+                            Icon(Icons.Default.Add, contentDescription = "予約追加")
+                        }
+                    }
                 }
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "予約追加")
-            }
-        }
+            )
+        },
     ) { innerPadding ->
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 350.dp),
@@ -79,11 +116,21 @@ fun ReservationListPage(
             items(reservations) { reservation ->
                 ReservationCard(
                     reservation = reservation,
-                    isSelected = selectedReservation == reservation,
+                    isSelected = !isEditMode && reservation == pinnedReservation,
                     onClick = {
-                        val newSelection = if (selectedReservation == reservation) null else reservation
-                        onReservationSelected(newSelection)
-                    }
+                        if (isEditMode) {
+                            if (reservation in selectedReservations) {
+                                selectedReservations.remove(reservation)
+                            } else {
+                                selectedReservations.add(reservation)
+                            }
+                        } else {
+                            onReservationPinned(
+                                if (pinnedReservation == reservation) null else reservation
+                            )
+                        }
+                    },
+                    showCheckbox = reservation in selectedReservations,
                 )
             }
         }

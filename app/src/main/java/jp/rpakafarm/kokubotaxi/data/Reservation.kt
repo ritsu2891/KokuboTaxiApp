@@ -64,7 +64,7 @@ private fun getGson(): Gson {
 
 /**
  * 予約情報のリスト
- * @since 0.1.1
+ * @since 1.0.0
  */
 fun loadReservations(context: Context): List<Reservation> {
     Log.d("kta", "Loading reservations")
@@ -79,7 +79,7 @@ fun loadReservations(context: Context): List<Reservation> {
 
 /**
  * 予約情報をローカルストレージに保存する
- * @since 0.1.1
+ * @since 1.0.0
  */
 fun saveReservations(context: Context, reservations: List<Reservation>) {
     Log.d("kta", "Saving reservations: ${reservations.size}")
@@ -94,20 +94,20 @@ fun saveReservations(context: Context, reservations: List<Reservation>) {
 }
 
 /**
- * 選択中の予約情報をローカルストレージから読み込む
+ * ピン留め中の予約情報をローカルストレージから読み込む
  * @since 0.1.0
  */
-fun loadSelectedReservation(context: Context): Reservation? {
+fun loadPinnedReservation(context: Context): Reservation? {
     val prefs = context.getSharedPreferences("reservation_prefs", Context.MODE_PRIVATE)
     val json = prefs.getString("selected_reservation", null)
     return if (json != null) getGson().fromJson(json, Reservation::class.java) else null
 }
 
 /**
- * 選択中の予約情報をローカルストレージに保存する
+ * ピン留め中の予約情報をローカルストレージに保存する
  * @since 0.1.0
  */
-fun saveSelectedReservation(context: Context, reservation: Reservation?) {
+fun savePinnedReservation(context: Context, reservation: Reservation?) {
     val prefs = context.getSharedPreferences("reservation_prefs", Context.MODE_PRIVATE)
     prefs.edit {
         if (reservation != null) {

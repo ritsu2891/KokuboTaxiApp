@@ -27,8 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import jp.rpakafarm.kokubotaxi.page.ReservationListPage
-import jp.rpakafarm.kokubotaxi.data.loadSelectedReservation
-import jp.rpakafarm.kokubotaxi.data.saveSelectedReservation
+import jp.rpakafarm.kokubotaxi.data.loadPinnedReservation
+import jp.rpakafarm.kokubotaxi.data.savePinnedReservation
 import jp.rpakafarm.kokubotaxi.page.HomePage
 import jp.rpakafarm.kokubotaxi.data.loadReservations
 import jp.rpakafarm.kokubotaxi.data.saveReservations
@@ -44,12 +44,12 @@ fun MainScreen() {
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var showReservationText by rememberSaveable { mutableStateOf(false) }
-    var selectedReservation by remember { mutableStateOf(loadSelectedReservation(context)) }
+    var pinnedReservation by remember { mutableStateOf(loadPinnedReservation(context)) }
     var reservations by remember { mutableStateOf(loadReservations(context)) }
 
     // 状態が変化するたびに保存
-    LaunchedEffect(selectedReservation) {
-        saveSelectedReservation(context, selectedReservation)
+    LaunchedEffect(pinnedReservation) {
+        savePinnedReservation(context, pinnedReservation)
     }
     LaunchedEffect(reservations) {
         saveReservations(context, reservations)
@@ -96,15 +96,15 @@ fun MainScreen() {
         ) { page ->
             when (page) {
                 0 -> HomePage(
-                    selectedReservation,
+                    pinnedReservation,
                     showReservationText,
                     onShowReservationTextChange = { showReservationText = it }
                 )
                 1 -> ReservationListPage(
                     reservations = reservations,
                     onReservationsChange = { reservations = it },
-                    selectedReservation = selectedReservation,
-                    onReservationSelected = { selectedReservation = it }
+                    pinnedReservation = pinnedReservation,
+                    onReservationPinned = { pinnedReservation = it }
                 )
             }
         }
