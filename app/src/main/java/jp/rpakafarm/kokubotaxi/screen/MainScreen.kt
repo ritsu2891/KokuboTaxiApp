@@ -10,6 +10,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -32,6 +33,7 @@ import jp.rpakafarm.kokubotaxi.data.savePinnedReservation
 import jp.rpakafarm.kokubotaxi.page.HomePage
 import jp.rpakafarm.kokubotaxi.data.loadReservations
 import jp.rpakafarm.kokubotaxi.data.saveReservations
+import jp.rpakafarm.kokubotaxi.page.SettingPage
 
 /**
  * メイン画面
@@ -40,7 +42,7 @@ import jp.rpakafarm.kokubotaxi.data.saveReservations
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
-    val tabs = listOf("ホーム", "予約一覧")
+    val tabs = listOf("ホーム", "予約一覧", "設定")
     val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { tabs.size })
     var showReservationText by rememberSaveable { mutableStateOf(false) }
@@ -76,6 +78,7 @@ fun MainScreen() {
                                 imageVector = when (index) {
                                     0 -> Icons.Filled.Home
                                     1 -> Icons.AutoMirrored.Filled.List
+                                    2 -> Icons.Filled.Settings
                                     else -> Icons.Filled.Home
                                 },
                                 contentDescription = null
@@ -106,6 +109,7 @@ fun MainScreen() {
                     pinnedReservation = pinnedReservation,
                     onReservationPinned = { pinnedReservation = it }
                 )
+                2 -> SettingPage()
             }
         }
     }
