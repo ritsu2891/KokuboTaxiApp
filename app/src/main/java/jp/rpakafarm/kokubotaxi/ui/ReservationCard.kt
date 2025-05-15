@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
  * @param isSelected 選択状態
  * @param onClick クリック時のコールバック
  * @since 0.1.0
+ * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @Composable
 fun ReservationCard(

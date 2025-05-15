@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatter
  * @param selectedReservation 選択された予約
  * @param onReservationSelected 予約が選択されたときのコールバック
  * @since 0.1.0
+ * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
