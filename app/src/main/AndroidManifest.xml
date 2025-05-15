@@ -11,11 +11,10 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.KokuboTaxi"
-            tools:targetApi="31">
+            >
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
-                android:label="@string/app_name"
                 android:theme="@style/Theme.KokuboTaxi"
                 android:launchMode="singleTask"> <!-- 既存インスタンスを再利用 -->
             <intent-filter>
