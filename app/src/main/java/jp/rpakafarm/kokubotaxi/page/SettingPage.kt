@@ -76,6 +76,7 @@ fun SettingPage() {
             modifier = Modifier.background(MaterialTheme.colorScheme.background)
         ) {
             HorizontalDivider(thickness = 2.dp)
+            /*
             ListItem(
                 leadingContent = {
                     Icon(
@@ -85,12 +86,15 @@ fun SettingPage() {
                 },
                 headlineContent = { Text("お得意様マスタ") }
             )
+            */
             Row (
                 modifier = Modifier.padding(all = 10.dp)
             ) {
                 OutlinedButton (onClick = {}) { Text(text = "予約CSV") }
+                /*
                 Spacer(Modifier.width(10.dp))
                 OutlinedButton (onClick = {}) { Text(text = "お得意様CSV") }
+                */
             }
         }
     }
