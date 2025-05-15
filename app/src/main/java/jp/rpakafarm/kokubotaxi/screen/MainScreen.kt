@@ -38,6 +38,7 @@ import jp.rpakafarm.kokubotaxi.page.SettingPage
 /**
  * メイン画面
  * @since 0.1.0
+ * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @Composable
 fun MainScreen() {
@@ -109,7 +110,9 @@ fun MainScreen() {
                     pinnedReservation = pinnedReservation,
                     onReservationPinned = { pinnedReservation = it }
                 )
-                2 -> SettingPage()
+                2 -> SettingPage(
+                    onReservationsChange = { reservations = it },
+                )
             }
         }
     }

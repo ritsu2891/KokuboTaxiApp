@@ -5,18 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -30,17 +24,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import jp.rpakafarm.kokubotaxi.R
+import android.app.AlertDialog
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import jp.rpakafarm.kokubotaxi.data.exportReservationsToCsv
+import jp.rpakafarm.kokubotaxi.data.importReservationsFromCsv
+import jp.rpakafarm.kokubotaxi.data.Reservation
 
 /**
  * 設定ページ
  * @since 1.0.0
+ * @author ChatGPT 4o, Ritsuki KOKUBO
  */
 @Composable
-fun SettingPage() {
+fun SettingPage(
+    onReservationsChange: (List<Reservation>) -> Unit
+) {
     val context = LocalContext.current
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
     val versionName = packageInfo?.versionName ?: "x.y.z"
     val versionCode = packageInfo?.longVersionCode ?: "n"
+
+    val reservationCsvImportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        uri?.let {
+            AlertDialog.Builder(context).apply {
+                setTitle("取込方法を選択")
+                setItems(arrayOf("洗い替え", "追加")) { _, which ->
+                    val replace = (which == 0)
+                    onReservationsChange(importReservationsFromCsv(context, it, replace))
+                }
+                setNegativeButton("キャンセル", null)
+            }.show()
+        }
+    }
+
+    val reservationCsvOutputLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/csv"),
+        onResult = { uri ->
+            if (uri != null) {
+                exportReservationsToCsv(context, uri)
+            }
+        }
+    )
 
     Column (
         modifier = Modifier.fillMaxHeight()
@@ -90,7 +118,20 @@ fun SettingPage() {
             Row (
                 modifier = Modifier.padding(all = 10.dp)
             ) {
-                OutlinedButton (onClick = {}) { Text(text = "予約CSV") }
+                OutlinedButton(onClick = {
+                    AlertDialog.Builder(context).apply {
+                        setTitle("予約CSV")
+                        setItems(arrayOf("予約出力", "予約取込")) { _, which ->
+                            when (which) {
+                                0 -> reservationCsvOutputLauncher.launch("KokuboTaxi_予約一覧.csv")
+                                1 -> reservationCsvImportLauncher.launch(arrayOf("text/csv", "text/comma-separated-values", "text/plain"))
+                            }
+                        }
+                        setNegativeButton("キャンセル", null)
+                    }.show()
+                }) {
+                    Text(text = "予約CSV")
+                }
                 /*
                 Spacer(Modifier.width(10.dp))
                 OutlinedButton (onClick = {}) { Text(text = "お得意様CSV") }
@@ -108,6 +149,6 @@ fun SettingPagePreview() {
             .height(900.dp)
             .background(Color.White)
     ) {
-        SettingPage()
+        SettingPage({})
     }
 }
