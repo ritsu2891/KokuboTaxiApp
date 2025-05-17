@@ -80,7 +80,7 @@ fun AnalogClock() {
         }
 
         // 時針
-        val hourAngle = Math.toRadians((currentTime.value.hour % 12 * 30 - 90).toDouble())
+        val hourAngle = Math.toRadians(( (currentTime.value.hour % 12 * 30) + (currentTime.value.minute * 0.5) - 90).toDouble())
         drawLine(
             color = Color.Black,
             start = center,
