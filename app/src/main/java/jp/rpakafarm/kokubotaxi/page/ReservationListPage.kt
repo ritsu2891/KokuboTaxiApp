@@ -176,11 +176,7 @@ fun ReservationListPage(
                 onDismissRequest = { showDialog = false },
                 title = { Text(text = "新規予約") },
                 text = {
-                    Column(
-                        modifier = Modifier
-                            .height(200.dp)
-                            .verticalScroll(rememberScrollState())
-                    ) {
+                    Column {
                         OutlinedTextField(
                             value = datetime,
                             onValueChange = { /* 直接編集は禁止 */ },
@@ -262,14 +258,24 @@ fun ReservationListPage(
                             destination = ""
                             selectedDateTime = null
                             showDialog = false
-                        }
+                        },
+                        enabled = (datetime != "" && customerName != "")
                     ) {
                         Text("登録")
                     }
                 },
                 dismissButton = {
                     OutlinedButton(
-                        onClick = { showDialog = false }
+                        onClick = {
+                            // リセット
+                            datetime = ""
+                            customerName = ""
+                            pickupAddress = ""
+                            phoneNumber = ""
+                            destination = ""
+                            selectedDateTime = null
+                            showDialog = false
+                        },
                     ) {
                         Text("キャンセル")
                     }
