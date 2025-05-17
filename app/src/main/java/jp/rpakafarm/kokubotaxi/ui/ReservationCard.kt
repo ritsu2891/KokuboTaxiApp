@@ -62,17 +62,17 @@ fun ReservationCard(
                     )
                 }
                 Text(
-                    text = reservation.customerName,
+                    text = if (reservation.customerName != "") "${reservation.customerName} 様" else "-----",
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Text(
-                    text = reservation.phoneNumber,
+                    text = if (reservation.phoneNumber != "") reservation.phoneNumber else "",
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
-                Text(text = reservation.pickupAddress)
-                Text(text = reservation.destination)
+                Text(text = if (reservation.pickupAddress != "") reservation.pickupAddress else "")
+                Text(text = if (reservation.destination != "") reservation.destination else "")
             }
             if (showCheckbox) {
                 Checkbox(
