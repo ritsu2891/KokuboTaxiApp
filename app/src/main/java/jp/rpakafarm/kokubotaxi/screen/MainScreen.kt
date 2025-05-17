@@ -102,6 +102,10 @@ fun MainScreen() {
         ) { page ->
             when (page) {
                 0 -> HomePage(
+                    reservations = reservations,
+                    onReservationsChange = { reservations = it },
+                    pinnedReservation = pinnedReservation,
+                    onReservationPinned = { pinnedReservation = it },
                     pinnedReservation,
                     showReservationText,
                     onShowReservationTextChange = { showReservationText = it }

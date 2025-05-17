@@ -10,11 +10,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,10 +41,16 @@ import jp.rpakafarm.kokubotaxi.ui.ReservationCard
  */
 @Composable
 fun HomePage(
+    reservations: List<Reservation>,
+    onReservationsChange: (List<Reservation>) -> Unit,
+    pinnedReservation: Reservation?,
+    onReservationPinned: (Reservation?) -> Unit,
     selectedReservation: Reservation?,
     showReservationText: Boolean,
     onShowReservationTextChange: (Boolean) -> Unit
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -100,7 +113,9 @@ fun HomePage(
                     ReservationCard(
                         reservation = it,
                         isSelected = true,
-                        onClick = {}
+                        onClick = {
+                            showDialog = true
+                        }
                     )
                 }
             } ?: Text(text = "")
@@ -121,5 +136,41 @@ fun HomePage(
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            title = {
+                Text(text = "削除")
+            },
+            text = {
+                Text(text = "本当に削除しますか？")
+            },
+            onDismissRequest = {},
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // 削除指定された予約の中にピン留め中の予約があれば解除する
+                        onReservationPinned(null)
+                        //ピン留め中の予約を削除
+                        onReservationsChange(
+                            reservations.filter { it != selectedReservation }
+                        )
+                        showDialog = false
+                    }
+                ) {
+                    Text("削除")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showDialog = false
+                    }
+                ) {
+                    Text("キャンセル")
+                }
+            }
+        )
     }
 }
