@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import jp.rpakafarm.kokubotaxi.data.Reservation
 import jp.rpakafarm.kokubotaxi.ui.ReservationCard
@@ -41,11 +42,15 @@ fun ReservationListPage(
     reservations: List<Reservation>,
     onReservationsChange: (List<Reservation>) -> Unit,
     pinnedReservation: Reservation?,
-    onReservationPinned: (Reservation?) -> Unit
+    onReservationPinned: (Reservation?) -> Unit,
+    filterSelectedIndex: Int,
+    onfilterSelectedIndexChange: (Int) -> Unit,
 ) {
     var showDialog by remember { mutableStateOf(false) }
     var isEditMode by remember { mutableStateOf(false) }
     val selectedReservations = remember { mutableStateListOf<Reservation>() }
+
+    val filterOptions = listOf("今日", "全て")
 
     var datetime by remember { mutableStateOf("") }
     var customerName by remember { mutableStateOf("") }
@@ -94,6 +99,26 @@ fun ReservationListPage(
                             Icon(Icons.Default.Delete, contentDescription = "削除実行")
                         }
                     }
+
+                    Spacer(Modifier.weight(1f))
+
+                    SingleChoiceSegmentedButtonRow (
+                        modifier = Modifier.width(180.dp),
+                    ) {
+                        filterOptions.forEachIndexed { index, label ->
+                            SegmentedButton(
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = filterOptions.size
+                                ),
+                                onClick = { onfilterSelectedIndexChange(index) },
+                                selected = index == filterSelectedIndex,
+                                label = { Text(label) }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.weight(1f))
                 },
                 floatingActionButton = {
                     if (!isEditMode) {
@@ -114,7 +139,17 @@ fun ReservationListPage(
                 .padding(16.dp)
                 .fillMaxSize()
         ) {
-            items(reservations) { reservation ->
+            items(
+                reservations
+                    .filter { reservation ->
+                        when (filterSelectedIndex) {
+                            0 -> reservation.datetime.toLocalDate() == LocalDateTime.now().toLocalDate()
+                            1 -> true
+                            else -> false
+                        }
+                    }
+                    .sortedBy { it.datetime }
+            ) { reservation ->
                 ReservationCard(
                     reservation = reservation,
                     isSelected = !isEditMode && reservation == pinnedReservation,
@@ -280,4 +315,33 @@ fun ReservationListPage(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun ReservationListPagePreview() {
+    val reservations = listOf(
+        Reservation(
+            datetime = LocalDateTime.now(),
+            customerName = "山田太郎",
+            pickupAddress = "東京都千代田区1-1-1",
+            phoneNumber = "090-1234-5678",
+            destination = "東京都新宿区2-2-2"
+        ),
+        Reservation(
+            datetime = LocalDateTime.now().plusDays(1),
+            customerName = "鈴木花子",
+            pickupAddress = "東京都港区3-3-3",
+            phoneNumber = "080-9876-5432",
+            destination = "東京都渋谷区4-4-4"
+        )
+    )
+    ReservationListPage(
+        reservations = reservations,
+        onReservationsChange = {},
+        pinnedReservation = null,
+        onReservationPinned = {},
+        filterSelectedIndex = 1,
+        onfilterSelectedIndexChange = {}
+    )
 }

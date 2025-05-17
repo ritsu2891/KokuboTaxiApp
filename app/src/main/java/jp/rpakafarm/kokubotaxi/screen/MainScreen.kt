@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,6 +50,7 @@ fun MainScreen() {
     var showReservationText by rememberSaveable { mutableStateOf(false) }
     var pinnedReservation by remember { mutableStateOf(loadPinnedReservation(context)) }
     var reservations by remember { mutableStateOf(loadReservations(context)) }
+    var filterSelectedIndex by remember { mutableIntStateOf(0) }
 
     // 状態が変化するたびに保存
     LaunchedEffect(pinnedReservation) {
@@ -108,7 +110,9 @@ fun MainScreen() {
                     reservations = reservations,
                     onReservationsChange = { reservations = it },
                     pinnedReservation = pinnedReservation,
-                    onReservationPinned = { pinnedReservation = it }
+                    onReservationPinned = { pinnedReservation = it },
+                    filterSelectedIndex = filterSelectedIndex,
+                    onfilterSelectedIndexChange = { filterSelectedIndex = it }
                 )
                 2 -> SettingPage(
                     onReservationsChange = { reservations = it },
